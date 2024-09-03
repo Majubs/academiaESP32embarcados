@@ -1,0 +1,14 @@
+CompileFlags:
+  Add: [
+  #-mlong-calls, 
+  # -isysroot=/home/majubs/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf
+    --target=xtensa-esp32s2-elf
+  ]
+  Remove: [
+    -fno-tree-switch-conversion, 
+    -mtext-section-literals, 
+    -mlongcalls, 
+    -fno-shrink-wrap,
+    -fstrict-volatile-bitfields,
+    -mdisable-hardware-atomics
+  ]

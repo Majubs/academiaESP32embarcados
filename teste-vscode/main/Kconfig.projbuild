@@ -1,0 +1,11 @@
+# put here your custom config value
+menu "Example Blink"
+config BLINK_GPIO
+    int "Blink GPIO number"
+    range 0 10
+    default 5
+    help
+        GPIO number (IOxx) to blink LED on and off.
+
+        GPIOs 35-39 are input only!
+endmenu
