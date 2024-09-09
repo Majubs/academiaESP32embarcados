@@ -26,6 +26,7 @@ static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
     uint32_t gpio_num = (uint32_t)arg;                  // get the GPIO number
     xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL); // send the GPIO number to the queue
+    // get_level here? or debounce?
 }
 
 // button task
@@ -60,20 +61,20 @@ void buttonTask(void *pvparameters)
 
 void app_main(void)
 {
+    gpio_config_t io_config = {};
     bool button_state1 = 1;
     bool button_state2 = 1;
-    // bool i = 0;
 
     gpio_reset_pin(LED_PIN_ONBOARD);
     gpio_set_direction(LED_PIN_ONBOARD, GPIO_MODE_OUTPUT);
 
-    gpio_reset_pin(BUTTON_PIN1);                       // reset pin and set as GPIO
-    gpio_set_direction(BUTTON_PIN1, GPIO_MODE_INPUT);  // set BUTTON_PIN as input
-    gpio_set_pull_mode(BUTTON_PIN1, GPIO_PULLUP_ONLY); // set pull-up resistor
-
-    gpio_reset_pin(BUTTON_PIN2);                       // reset pin and set as GPIO
-    gpio_set_direction(BUTTON_PIN2, GPIO_MODE_INPUT);  // set BUTTON_PIN as input
-    gpio_set_pull_mode(BUTTON_PIN2, GPIO_PULLUP_ONLY); // set pull-up resistor
+    // configure button1 and button2 using config type
+    io_config.pin_bit_mask = (1ULL << BUTTON_PIN1) | (1ULL << BUTTON_PIN2); // set GPIO6 and GPIO7 as input
+    io_config.mode = GPIO_MODE_INPUT;                                       // set GPIO6 and GPIO7 as input
+    io_config.pull_up_en = GPIO_PULLUP_ENABLE;                              // enable pull-up
+    io_config.pull_down_en = GPIO_PULLDOWN_DISABLE;                         // disable pull-down
+    io_config.intr_type = GPIO_INTR_ANYEDGE;                                // enable interrupt on negative edge
+    gpio_config(&io_config);                                                // configure GPIO6 and GPIO7
 
     gpio_evt_queue = xQueueCreate(1, sizeof(uint32_t));
     xTaskCreate(buttonTask, "buttonTask", 2048, NULL, 2, NULL);
