@@ -31,22 +31,17 @@ void app_main(void)
     ledc_channel_config(&channel_config);
 
     // initialize duty cycle value
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+    // ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
+    // ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+
+    ledc_fade_func_install(0);
 
     while (true)
     {
-        // fade routine
-        if (duty < 1024)
-        {
-            ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
-            ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-            duty++;
-        }
-        else
-        {
-            duty = 0;
-        }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        // HW fade
+        ledc_set_fade_time_and_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 1023, 1000, LEDC_FADE_WAIT_DONE);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        ledc_set_fade_time_and_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0, 1000, LEDC_FADE_WAIT_DONE);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
