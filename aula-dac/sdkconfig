@@ -371,6 +371,14 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
+# Wave form
+#
+# CONFIG_WAVE_SIN is not set
+CONFIG_WAVE_TRIANGLE=y
+# CONFIG_WAVE_SERRATED is not set
+# end of Wave form
+
+#
 # Compiler options
 #
 CONFIG_COMPILER_OPTIMIZATION_DEBUG=y

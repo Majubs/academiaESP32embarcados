@@ -24,8 +24,9 @@ void app_main(void)
 
     ESP_LOGI(TAG, "DAC oneshot start");
 
-    dac_cosine_handle_t chan1_handle;
-    dac_cosine_config_t cos1_cfg = {
+#ifdef CONFIG_WAVE_SIN
+    dac_cosine_handle_t chan0_handle;
+    dac_cosine_config_t cos0_cfg = {
         .chan_id = DAC_CHAN_1,                 // channel 0
         .freq_hz = 1000,                       // frequency 1kHz
         .clk_src = DAC_COSINE_CLK_SRC_DEFAULT, // default clock source
@@ -37,11 +38,13 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Initializing DAC cosine wave generator");
 
-    ESP_ERROR_CHECK(dac_cosine_new_channel(&cos1_cfg, &chan1_handle));
-    ESP_ERROR_CHECK(dac_cosine_start(chan1_handle));
+    ESP_ERROR_CHECK(dac_cosine_new_channel(&cos0_cfg, &chan0_handle));
+    ESP_ERROR_CHECK(dac_cosine_start(chan0_handle));
 
     ESP_LOGI(TAG, "DAC cosine wave generator initialized");
+#endif
 
+#if defined(CONFIG_WAVE_SERRATED) || defined(CONFIG_WAVE_TRIANGLE)
     while (true)
     {
         // DAC oneshot wave
@@ -51,10 +54,13 @@ void app_main(void)
             vTaskDelay(pdMS_TO_TICKS(1));
         }
 
+#ifdef CONFIG_WAVE_TRIANGLE
         for (int wave = 255; wave < 0; wave--)
         {
             ESP_ERROR_CHECK(dac_oneshot_output_voltage(chann0_handle, wave));
             vTaskDelay(pdMS_TO_TICKS(1));
         }
+#endif
     }
+#endif
 }

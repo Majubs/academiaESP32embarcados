@@ -1,0 +1,18 @@
+# put here your custom config value
+menu "Wave form"
+choice WAVE_TYPE
+    prompt "Select wave type"
+    default WAVE_SIN
+    help
+        Select one of three wave types:
+         * Sin
+         * Triangle
+         * Serrated
+    config WAVE_SIN
+        bool "Sin"
+    config WAVE_TRIANGLE
+        bool "Triangle"
+    config WAVE_SERRATED
+        bool "Serrated"
+endchoice
+endmenu
