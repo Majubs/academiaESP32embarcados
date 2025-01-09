@@ -538,12 +538,18 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
-# Example Configuration
+# MQTT Configuration
+#
+CONFIG_BROKER_URL="mqtt://broker.hivemq.com"
+# end of MQTT Configuration
+
+#
+# WiFi Configuration
 #
 CONFIG_ESP_WIFI_SSID="BIJU"
 CONFIG_ESP_WIFI_PASSWORD="lulamolusco22"
 CONFIG_ESP_MAXIMUM_RETRY=5
-# end of Example Configuration
+# end of WiFi Configuration
 
 #
 # Compiler options
