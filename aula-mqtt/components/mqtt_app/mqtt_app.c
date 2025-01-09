@@ -4,6 +4,7 @@
 
 static const char *TAG = "MQTT";
 static esp_mqtt_client_handle_t client; // handler for mqtt client
+static EventGroupHandle_t status_mqtt_event_group;
 
 static void mqtt_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -47,18 +48,42 @@ static void mqtt_event_handler(void *event_handler_arg, esp_event_base_t event_b
     }
 }
 
+int mqtt_app_is_connected(void)
+{
+    EventBits_t bits = xEventGroupGetBits(status_mqtt_event_group);
+    if (bits & MQTT_CONNECTED)
+    {
+        return 1;
+    }
+    return 0;
+}
+
 void mqtt_app_start()
 {
+    status_mqtt_event_group = xEventGroupCreate();
 
-    esp_mqtt_client_config_t esp_mqtt_client_config = {
-        .broker.address.uri = CONFIG_BROKER_URL,
-        .broker.address.port = 1883,
-    };
+    esp_mqtt_client_config_t esp_mqtt_client_config = {.network.disable_auto_reconnect = false,
+                                                       .session.keepalive = 30,
+                                                       .broker.address.uri = CONFIG_BROKER_URL,
+                                                       .broker.address.port = 1883,
+                                                       .session.last_will = {
+                                                           .topic = "esp32_mjbs/status",
+                                                           .msg = "Offline",
+                                                           .msg_len = strlen("Offline"),
+                                                           .qos = 1,
+                                                       }};
 
     ESP_LOGI(TAG, "Starting MQTT client");
     client = esp_mqtt_client_init(&esp_mqtt_client_config);
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
     esp_mqtt_client_start(client);
+    mqtt_app_publish("esp32_mjbs/status", "Online", 1, 0);
+}
+
+void mqtt_app_stop()
+{
+    esp_mqtt_client_stop(client);
+    ESP_LOGI(TAG, "MQTT client stopped");
 }
 
 void mqtt_app_subscribe(char *topic, int qos)
