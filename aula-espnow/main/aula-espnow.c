@@ -17,9 +17,10 @@
 #include "esp_log.h"
 
 #define BUTTON_PIN 11
-#define LED_PIN    8
+#define LED_PIN    4
 
-uint8_t receiver_mac[6] = {0x40, 0x4C, 0xCA, 0xFF, 0xFE, 0x56};
+// uint8_t receiver_mac[6] = {0x40, 0x4C, 0xCA, 0xFF, 0xFE, 0x56};
+uint8_t receiver_mac[6] = {0x7C, 0x87, 0xCE, 0x2F, 0xDA, 0x84};
 
 const char *TAG = "ESP NOW";
 
@@ -76,6 +77,8 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
+    get_mac();
+
     // init WiFi
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -97,9 +100,9 @@ void app_main(void)
     esp_now_add_peer(&peer);
 
     // GPIOs
-    gpio_reset_pin(BUTTON_PIN);
-    gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(BUTTON_PIN, GPIO_PULLUP_ONLY);
+    // gpio_reset_pin(BUTTON_PIN);
+    // gpio_set_direction(BUTTON_PIN, GPIO_MODE_INPUT);
+    // gpio_set_pull_mode(BUTTON_PIN, GPIO_PULLUP_ONLY);
     gpio_reset_pin(LED_PIN);
     gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
@@ -109,24 +112,25 @@ void app_main(void)
 
     while (1)
     {
-        uint8_t new_state = gpio_get_level(BUTTON_PIN);
+        // uint8_t new_state = gpio_get_level(BUTTON_PIN);
+        led_status = !led_status;
+        sprintf(send_msg_buffer, "LED %s", led_status ? "ON" : "OFF");
+        ESP_LOGI(TAG, "Sending ESP-NOW message");
+        esp_now_send(receiver_mac, (uint8_t *)send_msg_buffer, strlen(send_msg_buffer));
 
-        if (new_state != button_state)
-        {
-            button_state = new_state;
-            if (button_state == 0)
-            {
-                ESP_LOGI(TAG, "Button pressed");
-                led_status = !led_status;
-                sprintf(send_msg_buffer, "LED %s", led_status ? "ON" : "OFF");
-                esp_now_send(receiver_mac, (uint8_t *)send_msg_buffer, strlen(send_msg_buffer));
-            }
-            else
-            {
-                ESP_LOGI(TAG, "Button released");
-            }
-        }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        // if (new_state != button_state)
+        // {
+        //     button_state = new_state;
+        //     if (button_state == 0)
+        //     {
+        //         ESP_LOGI(TAG, "Button pressed");
+        //     }
+        //     else
+        //     {
+        //         ESP_LOGI(TAG, "Button released");
+        //     }
+        // }
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 
     ESP_ERROR_CHECK(esp_now_deinit());
