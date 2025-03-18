@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -7,6 +8,8 @@
 #include "esp_partition.h"
 #include "esp_log.h"
 #include "freertos/portable.h"
+
+#include "nvs_handler.h"
 
 static const char *TAG = "RAM";
 
@@ -127,6 +130,20 @@ void app_main(void)
 
     // Release the partition iterator to release memory allocated for it
     esp_partition_iterator_release(it);
+
+    ESP_LOGI(TAG, "HTMLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+
+    extern const uint8_t page_html_start[] asm("_binary_page_html_start");
+    extern const uint8_t page_html_end[] asm("_binary_page_html_end");
+
+    ESP_LOGI(TAG, "Start address: %p | End address: %p", page_html_start, page_html_end);
+    ESP_LOGI(TAG, "Size: %d", page_html_end - page_html_start);
+    ESP_LOGI(TAG, "CONTENT:\n\n%s\n", page_html_start);
+
+    ESP_LOGI(TAG, "NVSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    nvs_handler_config();
+    pid_controller_t pid;
+    nvs_handler_read_pid(&pid);
 
     ESP_LOGI(TAG, "Example end");
 }
