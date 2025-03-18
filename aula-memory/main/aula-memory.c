@@ -11,7 +11,7 @@
 
 #include "nvs_handler.h"
 
-static const char *TAG = "RAM";
+static const char *TAG = "MEM";
 
 // Get the string name of type enum values used in this example
 static const char *get_type_str(esp_partition_type_t type)

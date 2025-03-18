@@ -15,15 +15,20 @@ void nvs_handler_config()
 {
     ESP_LOGI(TAGNVS, "Initializing NVS");
 
-    esp_err_t err = nvs_flash_init();
+    esp_err_t err = nvs_flash_init_partition("nvs_ext");
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();
+        ESP_ERROR_CHECK(nvs_flash_erase_partition("nvs_ext"));
+        err = nvs_flash_init_partition("nvs_ext");
     }
-    ESP_ERROR_CHECK(err);
+    // ESP_ERROR_CHECK(err);
 
-    err = nvs_open("storage", NVS_READWRITE, &nvs_hand);
+    // NVS statistics
+    nvs_stats_t statistics;
+    nvs_get_stats("nvs_ext", &statistics);
+    ESP_LOGI(TAGNVS, "Used: %d | Free: %d | Namespace count: %d", statistics.used_entries, statistics.free_entries, statistics.namespace_count);
+
+    err = nvs_open_from_partition("nvs_ext", "storage", NVS_READWRITE, &nvs_hand);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAGNVS, "Error (%s) opening NVS handle", esp_err_to_name(err));
@@ -58,7 +63,7 @@ void nvs_handler_config()
 
 bool nvs_handler_read_pid(pid_controller_t *pid_ctl)
 {
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_hand);
+    esp_err_t err = nvs_open_from_partition("nvs_ext", "storage", NVS_READWRITE, &nvs_hand);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAGNVS, "Error (%s) opening NVS handle", esp_err_to_name(err));
