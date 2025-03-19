@@ -5,3 +5,5 @@ build
 
 sdkconfig
 sdkconfig.old
+
+dependencies.lock
