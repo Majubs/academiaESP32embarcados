@@ -26,7 +26,7 @@ void string_Upper(char *str)
 
     for (size_t i = 0; str[i]; i++)
     {
-        if (str[i] == 32)
+        if ((str[i] < 97) || (str[i] > 122))
             continue;
         str[i] -= 32;
     }
@@ -41,7 +41,7 @@ void string_Lower(char *str)
 
     for (size_t i = 0; str[i]; i++)
     {
-        if (str[i] == 32)
+        if ((str[i] < 65) || (str[i] > 90))
             continue;
         str[i] += 32;
     }
